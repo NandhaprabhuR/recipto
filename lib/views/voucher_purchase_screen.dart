@@ -133,7 +133,25 @@ class _VoucherPurchaseScreenState extends ConsumerState<VoucherPurchaseScreen> {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               InkWell(
-                onTap: () => Navigator.of(context).pop(),
+                onTap: () {
+                  // Replaced Navigator.pop() with a simple Dialog since this is the root route.
+                  // Popping the root causes a black screen.
+                  showDialog(
+                    context: context,
+                    builder: (context) => AlertDialog(
+                      title: const Text('Close'),
+                      content: const Text(
+                        'This is the main screen of the application. There is nowhere to go back to!',
+                      ),
+                      actions: [
+                        TextButton(
+                          onPressed: () => Navigator.of(context).pop(),
+                          child: const Text('OK'),
+                        ),
+                      ],
+                    ),
+                  );
+                },
                 child: const Icon(Icons.close, color: Colors.black87),
               ),
               Container(
@@ -548,7 +566,44 @@ class _VoucherPurchaseScreenState extends ConsumerState<VoucherPurchaseScreen> {
             borderRadius: BorderRadius.circular(12),
           ),
         ),
-        onPressed: state.isDisabled ? null : () {},
+        onPressed: state.isDisabled
+            ? null
+            : () {
+                // Replacing SnackBar with Dialog to guarantee it shows above the keyboard/button
+                showDialog(
+                  context: context,
+                  builder: (BuildContext context) {
+                    return AlertDialog(
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(16),
+                      ),
+                      title: const Row(
+                        children: [
+                          Icon(Icons.check_circle, color: Colors.green),
+                          SizedBox(width: 8),
+                          Text('Success'),
+                        ],
+                      ),
+                      content: Text(
+                        'Processing payment of ₹${state.youPay.toStringAsFixed(0)}! 🎉',
+                        style: const TextStyle(fontSize: 16),
+                      ),
+                      actions: [
+                        TextButton(
+                          onPressed: () => Navigator.of(context).pop(),
+                          child: const Text(
+                            'OK',
+                            style: TextStyle(
+                              color: Colors.purple,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ),
+                      ],
+                    );
+                  },
+                );
+              },
         child: Text(
           state.isDisabled
               ? 'Enter Amount'
