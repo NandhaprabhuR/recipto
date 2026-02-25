@@ -1,6 +1,7 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
+import 'dart:async';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:recipto/models/voucher_model.dart';
+import 'package:recipto/repositories/voucher_repository.dart';
 
 class VoucherState {
   final bool isLoading;
@@ -60,26 +61,38 @@ class VoucherController extends Notifier<VoucherState> {
     return const VoucherState();
   }
 
-  Future<void> loadVoucher(String voucherId) async {
-    try {
-      final doc = await FirebaseFirestore.instance
-          .collection('vouchers')
-          .doc(voucherId)
-          .get();
+  StreamSubscription<VoucherModel?>? _subscription;
 
-      if (doc.exists && doc.data() != null) {
-        final voucher = VoucherModel.fromJson(doc.data()!);
-        state = state.copyWith(isLoading: false, voucher: voucher);
-        _recalculate();
-      } else {
-        state = state.copyWith(
-          isLoading: false,
-          errorMessage: 'Voucher not found in database.',
+  Future<void> loadVoucher(String voucherId) async {
+    _subscription?.cancel();
+
+    final repository = ref.read(voucherRepositoryProvider);
+
+    _subscription = repository
+        .watchVoucher(voucherId)
+        .listen(
+          (voucher) {
+            if (voucher != null) {
+              state = state.copyWith(isLoading: false, voucher: voucher);
+              _recalculate();
+            } else {
+              state = state.copyWith(
+                isLoading: false,
+                errorMessage: 'Voucher not found in database.',
+              );
+            }
+          },
+          onError: (e) {
+            state = state.copyWith(
+              isLoading: false,
+              errorMessage: e.toString(),
+            );
+          },
         );
-      }
-    } catch (e) {
-      state = state.copyWith(isLoading: false, errorMessage: e.toString());
-    }
+
+    ref.onDispose(() {
+      _subscription?.cancel();
+    });
   }
 
   void setAmount(double amount) {

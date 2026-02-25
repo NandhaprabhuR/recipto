@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:recipto/controllers/voucher_controller.dart';
 import 'package:recipto/models/voucher_model.dart';
@@ -223,6 +224,17 @@ class _VoucherPurchaseScreenState extends ConsumerState<VoucherPurchaseScreen> {
                   keyboardType: const TextInputType.numberWithOptions(
                     decimal: true,
                   ),
+                  inputFormatters: [
+                    FilteringTextInputFormatter.allow(RegExp(r'^\d+\.?\d*')),
+                    TextInputFormatter.withFunction((oldValue, newValue) {
+                      if (newValue.text.isEmpty) return newValue;
+                      final double? val = double.tryParse(newValue.text);
+                      if (val == null || val > voucher.maxAmount) {
+                        return oldValue;
+                      }
+                      return newValue;
+                    }),
+                  ],
                   style: const TextStyle(
                     fontSize: 24,
                     fontWeight: FontWeight.bold,
