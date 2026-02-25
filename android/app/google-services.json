@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "725376365522",
+    "project_id": "recipto-5dc45",
+    "storage_bucket": "recipto-5dc45.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:725376365522:android:e5a652b953896c95470e0b",
+        "android_client_info": {
+          "package_name": "com.example.recipto"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBzPiovIep_god2o5SRfTNrvsKie0ybwM8"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
